@@ -2,9 +2,52 @@ kind: pipeline
 type: docker
 name: default
 
+services:
+  - name: hello-world
+    image: rust:1.67.1
+    environment:
+      PORT: 8080
+    commands:
+      - cargo clean
+      - cargo run
+    volumes:
+      - name: cache
+        path: /root/.cargo
+
 steps:
-- name: build
-  image: rust:1.67.1
-  commands:
-  - cargo clean 
-  - cargo build --release
+  - name: wait for the service hello-world to be up
+    image: alpine
+    commands:
+      - apk add -U --no-cache curl
+      - until curl --output /dev/null --silent --head --fail http://hello-world:8080 ; do sleep 5; done;
+ 
+  - name: test
+    image: rust:1.67.1
+    pull: if-not-exists
+    environment:
+      SERVICE_URL: "http://hello-world:8080"
+    commands:
+      - cargo test
+    volumes:
+      - name: cache
+        path: /root/.cargo
+
+  - name: build
+    image: rust:1.67.1
+    pull: if-not-exists
+    commands:
+      - cargo build --release
+    volumes:
+      - name: cache
+        path: /root/.cargo
+
+  - name: push
+    image: thegeeklab/drone-docker-buildx:23
+    privileged: true
+    settings:
+      auto_tag: true
+      # all other settings are loaded form .env file with PLUGIN_* values
+
+volumes:
+  - name: cache
+    temp: {}

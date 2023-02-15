@@ -1,0 +1,8 @@
+services:
+  helloworld:
+    image: "${PLUGIN_REPO}"
+    environment:
+      - RUST_LOG=info
+      - PORT=8080
+    ports:
+      - "8080:8080"
