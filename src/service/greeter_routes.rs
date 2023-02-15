@@ -14,7 +14,7 @@ pub async fn greet(Query(params): Query<HashMap<String, String>>) -> (StatusCode
     };
 
     if let Some(name) = params.get("name") {
-        greeting.message = format!("Hello!{}", name);
+        greeting.message = format!("Hello! {}!", name);
     }
 
     (StatusCode::OK, Json(greeting))
