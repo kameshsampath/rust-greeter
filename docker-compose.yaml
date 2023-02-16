@@ -1,10 +1,12 @@
 services:
   helloworld:
     image: "${PLUGIN_REPO}"
+    pull_policy: always
     # build:
     #   context: .
     #   platforms:
     #     - linux/arm64
+    #     - linux/amd64
     environment:
       - RUST_LOG=info
       - PORT=8080

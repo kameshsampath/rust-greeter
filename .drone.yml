@@ -49,5 +49,7 @@ steps:
     image: thegeeklab/drone-docker-buildx:23
     privileged: true
     settings:
-      auto_tag: true
       context: target
+      tags: true
+      labels:
+       - org.opencontainers.image.source: https://github.com/kameshsampath/rust-hello-world
