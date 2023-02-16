@@ -7,8 +7,30 @@ dotenv:
 
 vars:
   BUILDER: buildx-multi-arch
+  LIMA_INSTANCE: rust-dev-env
 
 tasks:
+  build_env:
+    aliases:
+      - dev_env
+    desc: start lima-vm to run rust commands
+    silent: true
+    cmds:
+      - limactl start --name={{.LIMA_INSTANCE}} --tty=false {{.LIMA_INSTANCE}}.yaml
+
+  dev_shell:
+    aliases:
+      - shell
+    silent: true
+    desc: shell into the lima vm
+    cmds:
+      - limactl shell {{.LIMA_INSTANCE}} bash
+
+  delete_build_env:
+    desc: stop and delete lima-vm {{.LIMA_INSTANCE}}
+    silent: true
+    cmds:
+      - limactl delete --force {{.LIMA_INSTANCE}}
   prepare-buildx:
     desc: prepare the docker buildx environment
     cmds:
@@ -29,15 +51,23 @@ tasks:
     cmds:
       - cargo test
     silent: true
-  image:
-    desc: build ad push the image to container registry
+  builder-image:
+    desc: build the rust builder image that will be used with ci task. The builder can build targets for linux arm64/amd64
     deps:
       - prepare-buildx
     cmds:
-      # - docker buildx build --builder="{{.BUILDER}}" -t "{{.PLUGIN_REPO}}" --platform=linux/arm64 --no-cache --platform=linux/amd64 --push -f Dockerfile .
-      - docker buildx build --builder="{{.BUILDER}}" -t "{{.PLUGIN_REPO}}" --platform=linux/arm64 --no-cache --load -f Dockerfile .
+      # - docker buildx build --builder="{{.BUILDER}}" -t "{{.IMAGE}}" --platform=linux/arm64 --platform=linux/amd64 --push -f Dockerfile.builder .
+      - docker buildx build --builder="{{.BUILDER}}" -t "{{.IMAGE}}" --platform=linux/arm64 --load -f Dockerfile.builder .
+    vars:
+      IMAGE: ghcr.io/kameshsampath/rust-builder
+  load-image:
+    desc: build and load the image to local docker daemon for verification and testing
+    deps:
+      - prepare-buildx
+    cmds:
+      - docker buildx build --builder="{{.BUILDER}}" -t "{{.PLUGIN_REPO}}" --platform=linux/arm64 --load -f Dockerfile .
   ci:
-    desc: runs the drone ci build to do cross platform builds
+    desc: runs the drone ci build to do cross platform builds and push the image to container registry
     cmds:
       - drone exec --trusted --env-file=.env
     silent: true

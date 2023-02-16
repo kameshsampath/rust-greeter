@@ -1,0 +1,118 @@
+# Example to use Docker instead of containerd & nerdctl
+# $ limactl start ./docker.yaml
+# $ limactl shell docker docker run -it -v $HOME:$HOME --rm alpine
+
+# To run `docker` on the host (assumes docker-cli is installed):
+# $ export DOCKER_HOST=$(limactl list docker --format 'unix://{{.Dir}}/sock/docker.sock')
+# $ docker ...
+
+# This example requires Lima v0.8.0 or later
+images:
+- location: "https://cloud.debian.org/images/cloud/bullseye/20221205-1220/debian-11-generic-amd64-20221205-1220.qcow2"
+  arch: "x86_64"
+  digest: "sha512:25c6f2b5d61b0897077533023cccb05badb2d3fd5adc9ca9071fb8f1fe5ffe682a09f12279ef8013dc5641d20ff16eedc09e3b4657d81bcf455bdb9b4cd8ba54"
+- location: "https://cloud.debian.org/images/cloud/bullseye/20221205-1220/debian-11-generic-arm64-20221205-1220.qcow2"
+  arch: "aarch64"
+  digest: "sha512:9d09c70030bbbc4680f4ada358a2fc3e57f73d37789384a4230d4f374629a3edc04982ac67423e8dc4531cba9abf5f89891a974d51ebc8f48bfc626d4171f09b"
+
+mounts:
+- location: "~"
+- location: "/tmp/lima"
+  writable: true
+# containerd is managed by Docker, not by Lima, so the values are set to false here.
+containerd:
+  system: false
+  user: false
+provision:
+- mode: system
+  # This script defines the host.docker.internal hostname when hostResolver is disabled.
+  # It is also needed for lima 0.8.2 and earlier, which does not support hostResolver.hosts.
+  # Names defined in /etc/hosts inside the VM are not resolved inside containers when
+  # using the hostResolver; use hostResolver.hosts instead (requires lima 0.8.3 or later).
+  script: |
+    #!/bin/sh
+    sed -i 's/host.lima.internal.*/host.lima.internal host.docker.internal/' /etc/hosts
+- mode: system
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+    machine=$(uname -m)
+    case "${machine}" in
+      x86_64*|i?86_64*|amd64*)
+        arch="amd64"
+        dpkg --add-architecture arm64
+        EOF
+        ;;
+      aarch64*|arm64*)
+        arch="arm64"
+        dpkg --add-architecture amd64
+        ;;
+      arm*)
+        arch="arm"
+        ;;
+      i?86*)
+        arch="386"
+        ;;
+      *)
+        echo "Unknown, unsupported architecture (${machine})." >&2
+        echo "Supported architectures x86_64, i686, arm, arm64." >&2
+        echo "Bailing out." >&2
+        exit 3
+        ;;
+    esac
+    
+    apt-get update -y
+    apt install -y curl git wget build-essential crossbuild-essential-amd64 crossbuild-essential-arm64
+- mode: user
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+    export CARGO_HOME=~/.cargo
+    mkdir $CARGO_HOME
+
+    curl -sSf https://static.rust-lang.org/rustup/rustup-init.sh -o  rustup-init.sh
+    chmod +x rustup-init.sh
+    ./rustup-init.sh -y --target add x86_64-unknown-linux-gnu aarch64-unknown-linux-gnu
+
+    kernel=$(uname -s)
+    case "${kernel}" in
+      Linux)
+        platform="linux"
+        ;;
+      *)
+        echo "Unknown, unsupported platform: ${kernel}." >&2
+        echo "Supported platforms: Linux" >&2
+        echo "Bailing out." >&2
+        exit 2
+    esac
+
+    machine=$(uname -m)
+    case "${machine}" in
+      x86_64*|i?86_64*|amd64*)
+        arch="amd64"
+        {
+         printf "[target.aarch64-unknown-linux-gnu]\n"
+         printf "linker = \"aarch64-linux-gnu-gcc\"\n"
+        } > $CARGO_HOME/config
+        ;;
+      aarch64*|arm64*)
+        arch="arm64"
+        {
+         printf "[target.x86_64-unknown-linux-gnu]\n"
+         printf "linker = \"x86_64-linux-gnu-gcc\"\n"
+        } > $CARGO_HOME/config
+        ;;
+      arm*)
+        arch="arm"
+        ;;
+      i?86*)
+        arch="386"
+        ;;
+      *)
+        echo "Unknown, unsupported architecture (${machine})." >&2
+        echo "Supported architectures x86_64, i686, arm, arm64." >&2
+        echo "Bailing out." >&2
+        exit 3
+        ;;
+    esac
+
