@@ -4,7 +4,7 @@ name: default
 
 services:
   - name: hello-world
-    image: docker.io/kameshsampath/rust-zig-builder:main
+    image: docker.io/kameshsampath/rust-zig-builder:v0.1.0
     user: root
     environment:
       PORT: 8080
@@ -23,7 +23,7 @@ steps:
       - until curl --output /dev/null --silent --head --fail http://hello-world:8080 ; do sleep 5; done;
 
   - name: test
-    image: docker.io/kameshsampath/rust-zig-builder:main
+    image: docker.io/kameshsampath/rust-zig-builder:v0.1.0
     pull: if-not-exists
     user: root
     environment:
@@ -35,7 +35,7 @@ steps:
         path: /usr/local/cargo/registry
 
   - name: build
-    image: docker.io/kameshsampath/rust-zig-builder:main
+    image: docker.io/kameshsampath/rust-zig-builder:v0.1.0
     pull: if-not-exists
     user: root
     environment:
