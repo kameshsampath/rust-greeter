@@ -2,11 +2,17 @@
 
 A [rust-lang](https://rust-lang.org) demo on building API using [axum](https://github.com/tokio-rs/axum).
 
+The demo application will be crossed compiled into,
+
+- [x] linux/arm64 (`aarch64-unknown-linux-musl`)
+- [x] linux/amd64 (`x86_64-unknown-linux-musl`)
+
 ## Pre-requisites
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [rust-lang](https://rust-lang.org)
 - [drone cli](https://docs.drone.io/cli/install/)
+- [Taskfile](https://taskfile.dev)
 
 ## Building Locally
 
@@ -44,7 +50,9 @@ Once the server is up you can try the following REST URIs,
 
 ## Build and Push Image to Docker Registry
 
-Create a dotenv file `.env` on the root of the project with the following content,
+Create a file `.env` under `$PROJECT_HOME`,
+
+>**NOTE**: You can copy the file [.env.example](./.env.example) to `.env` and update with your setting
 
 ```shell
 PLUGIN_USERNAME=<container registry username>
@@ -63,7 +71,7 @@ PLUGIN_REGISTRY=ghcr.io
 ```
 
 ```shell
-drone exec --trusted --env-file=.env
+task ci
 ```
 
 Once the image is pushed run the following command,
@@ -74,4 +82,4 @@ docker-compose up
 
 Find the exposed port using the command `docker ps` and [test the application](#testing-application) the URIs.
 
->> **NOTE**: Replace `3000` with the exposed port from `docker ps`
+>> **NOTE**: If the port `8080` is not available on your machine, try using other ports.

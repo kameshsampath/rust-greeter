@@ -1,13 +1,14 @@
 # https://taskfile.dev
 
-version: '3'
+version: "3"
 
 dotenv:
   - .env
 
 vars:
   BUILDER: buildx-multi-arch
-  LIMA_INSTANCE: rust-dev-env
+  LIMA_INSTANCE: rust-dev-env-alpine
+  BUILDER_IMAGE: kameshsampath/rust-builder
 
 tasks:
   build_env:
@@ -31,43 +32,50 @@ tasks:
     silent: true
     cmds:
       - limactl delete --force {{.LIMA_INSTANCE}}
+ 
   prepare-buildx:
     desc: prepare the docker buildx environment
     cmds:
       - docker buildx inspect "{{.BUILDER}}" || docker buildx create --name="{{.BUILDER}}" --driver=docker-container --driver-opt=network=host
     silent: true
+  
   clean:
-    desc: cleans the target directory
+    desc: cleans the target directory/$CARGO_TARGET_DIR
     cmds:
-      - cargo clean
+      - cargo $CARGO_TARGET_DIR
     silent: true
+  
   build:
     desc: builds the application for host platform
     cmds:
       - cargo build
     silent: true
+  
   test:
     desc: runs the unit and integration tests
     cmds:
       - cargo test
     silent: true
-  builder-image:
-    desc: build the rust builder image that will be used with ci task. The builder can build targets for linux arm64/amd64
-    deps:
-      - prepare-buildx
-    cmds:
-      # - docker buildx build --builder="{{.BUILDER}}" -t "{{.IMAGE}}" --platform=linux/arm64 --platform=linux/amd64 --push -f Dockerfile.builder .
-      - docker buildx build --builder="{{.BUILDER}}" -t "{{.IMAGE}}" --platform=linux/arm64 --load -f Dockerfile.builder .
-    vars:
-      IMAGE: ghcr.io/kameshsampath/rust-builder
+
   load-image:
     desc: build and load the image to local docker daemon for verification and testing
+    silent: true
     deps:
       - prepare-buildx
     cmds:
       - docker buildx build --builder="{{.BUILDER}}" -t "{{.PLUGIN_REPO}}" --platform=linux/arm64 --load -f Dockerfile .
   ci:
     desc: runs the drone ci build to do cross platform builds and push the image to container registry
+    silent: true
     cmds:
       - drone exec --trusted --env-file=.env
+
+  cross:
+    desc: Cross compile binaries to linux/arm64 and linux/amd64
     silent: true
+    cmds:
+      - rm -rf target
+      - cargo clean
+      - cargo zigbuild --profile=release --target aarch64-unknown-linux-musl
+      - cargo zigbuild --profile=release --target x86_64-unknown-linux-musl
+      - mv $CARGO_TARGET_DIR target

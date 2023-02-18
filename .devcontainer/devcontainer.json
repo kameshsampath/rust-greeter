@@ -1,0 +1,43 @@
+{
+	"name": "Rust Builder",
+	"image": "kameshsampath/rust-zig-builder",
+	"runArgs": [
+		"--init"
+	],
+	"containerUser": "builder",
+	"privileged": true,
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [
+		8080
+	],
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "uname -a",
+	// Replace when using a ptrace-based debugger like C++, Go, and Rust
+	// "runArgs": [ "--init", "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
+	"workspaceMount": "source=${localWorkspaceFolder},target=/home/builder/build,type=bind",
+	"workspaceFolder": "/home/builder/build",
+	"mounts": [
+		// using the registry cache from host to makes build faster
+		"type=bind,source=${localEnv:HOME}/cargo/registry,target=/home/builder/.cargo/registry"
+	],
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"workbench.colorTheme": "One Dark Pro Darker",
+				"[yaml]": {
+					"editor.defaultFormatter": "redhat.vscode-yaml",
+					"editor.tabSize": 2
+				},
+				"[rust]": {
+					"editor.formatOnSave": true
+				}
+			},
+			"extensions": [
+				"rust-lang.rust-analyzer",
+				"redhat.vscode-yaml",
+				"zhuangtongfa.material-theme",
+				"EditorConfig.EditorConfig"
+			]
+		}
+	}
+}

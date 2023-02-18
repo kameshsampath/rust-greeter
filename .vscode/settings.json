@@ -1,0 +1,6 @@
+{
+  "ansible.executionEnvironment.volumeMounts": [],
+  "yaml.schemas": {
+    "https://taskfile.dev/schema.json": "Taskfile.**.yaml"
+  }
+}
