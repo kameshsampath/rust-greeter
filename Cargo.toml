@@ -1,6 +1,6 @@
 [package]
 name = "rgreeter"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "A simple REST API to greeter a user by name. Typically used for quick demos and checks."
 readme = "README.md"
