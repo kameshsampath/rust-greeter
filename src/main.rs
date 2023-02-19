@@ -1,6 +1,6 @@
 use std::{env, net::SocketAddr};
 
-use rust_hello_world::service::HelloWorld as hello_world_service;
+use rgreeter::service::HelloWorld as hello_world_service;
 use tracing::info;
 use tracing_subscriber::{self, EnvFilter};
 

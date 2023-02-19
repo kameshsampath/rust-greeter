@@ -51,10 +51,32 @@ tasks:
       - cargo build
     silent: true
   
-  test:
-    desc: runs the unit and integration tests
+  unit_test:
+    desc: runs the unit tests
+    aliases:
+      - ut
     cmds:
-      - cargo test
+      - cargo test --lib
+    silent: true
+  
+  integration_test:
+    desc: runs only integration tests
+    aliases:
+      - it
+    env:
+      SERVICE_URL: http://localhost:8080
+    preconditions:
+      - sh: 'curl $SERVICE_URL'
+        msg: "Please start the application using cargo run `PORT=8080 cargo run"
+    cmds:
+      - cargo test --test='*'
+    silent: true
+  
+  test:
+    desc: runs unit and integration tests
+    cmds:
+      - task: ut
+      - task: it
     silent: true
 
   load-image:

@@ -3,7 +3,7 @@ type: docker
 name: default
 
 services:
-  - name: hello-world
+  - name: rgreeter
     image: docker.io/kameshsampath/rust-zig-builder:v0.1.0
     user: root
     environment:
@@ -16,18 +16,18 @@ services:
         path: /usr/local/cargo/registry
 
 steps:
-  - name: wait for the service hello-world to be up
+  - name: wait for the service rgreeter to be up
     image: alpine
     commands:
       - apk add -U --no-cache curl
-      - until curl --output /dev/null --silent --head --fail http://hello-world:8080 ; do sleep 5; done;
+      - until curl --output /dev/null --silent --head --fail http://rgreeter:8080 ; do sleep 5; done;
 
   - name: test
     image: docker.io/kameshsampath/rust-zig-builder:v0.1.0
     pull: if-not-exists
     user: root
     environment:
-      SERVICE_URL: "http://hello-world:8080"
+      SERVICE_URL: "http://rgreeter:8080"
     commands:
       - cargo test --target-dir=/tmp/build
     volumes:
@@ -51,7 +51,7 @@ steps:
       context: target
       tags: latest
       labels:
-       - org.opencontainers.image.source: https://github.com/kameshsampath/rust-hello-world
+       - org.opencontainers.image.source: https://github.com/kameshsampath/rgreeter
 
 volumes:
   - name: cargo-cache

@@ -7,9 +7,9 @@ FROM busybox as bin
 
 WORKDIR /build
 
-COPY x86_64-unknown-linux-musl/release/rust-hello-world /build/rust-hello-world_amd64
+COPY x86_64-unknown-linux-musl/release/rgreeter /build/rgreeter_amd64
 
-COPY aarch64-unknown-linux-musl/release/rust-hello-world /build/rust-hello-world_arm64
+COPY aarch64-unknown-linux-musl/release/rgreeter /build/rgreeter_arm64
 
 # Dynamically Linked binary needs runtime dependencies
 # FROM debian:bullseye-slim
@@ -18,9 +18,9 @@ COPY aarch64-unknown-linux-musl/release/rust-hello-world /build/rust-hello-world
 
 # RUN apt-get update & rm -rf /var/lib/apt/lists/*
 
-# COPY --from=bin /build/rust-hello-world_$TARGETARCH /usr/bin/hello-world
+# COPY --from=bin /build/rgreeter_$TARGETARCH /usr/bin/rgreeter
 
-# CMD [ "/usr/bin/hello-world" ]
+# CMD [ "/usr/bin/rgreeter" ]
 
 # statically linked binary
 
@@ -28,6 +28,6 @@ FROM scratch
 
 ARG TARGETARCH
 
-COPY --from=bin /build/rust-hello-world_$TARGETARCH /usr/bin/hello-world
+COPY --from=bin /build/rgreeter_$TARGETARCH /usr/bin/rgreeter
 
-ENTRYPOINT [ "/usr/bin/hello-world" ]
+ENTRYPOINT [ "/usr/bin/rgreeter" ]

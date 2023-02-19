@@ -1,4 +1,4 @@
-# Rust Hello World
+# Rust Greeter
 
 A [rust-lang](https://rust-lang.org) demo on building API using [axum](https://github.com/tokio-rs/axum).
 
@@ -6,6 +6,8 @@ The demo application will be crossed compiled into,
 
 - [x] linux/arm64 (`aarch64-unknown-linux-musl`)
 - [x] linux/amd64 (`x86_64-unknown-linux-musl`)
+
+The demo uses [cargo-zigbuild](https://github.com/cargo-zigbuild) as tool for cross compilation.
 
 ## Pre-requisites
 
@@ -23,7 +25,7 @@ cargo build
 Start the server,
 
 ```shell
-./target/debug/rust-hello-world
+./target/debug/rgreeter
 ```
 
 ## Testing
@@ -66,7 +68,7 @@ e.g.
 ```shell
 PLUGIN_USERNAME=octocat
 PLUGIN_PASSWORD=octocat registry password
-PLUGIN_REPO=ghcr.io/octocat/rust-hello-world
+PLUGIN_REPO=ghcr.io/octocat/rgreeter
 PLUGIN_REGISTRY=ghcr.io
 ```
 

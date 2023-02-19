@@ -2,6 +2,6 @@ FROM scratch
 
 ARG TARGETARCH
 
-COPY x86_64-unknown-linux-musl/release/rust-hello-world /usr/bin/hello-world
+COPY x86_64-unknown-linux-musl/release/rgreeter /usr/bin/rgreeter
 
-ENTRYPOINT [ "/usr/bin/hello-world" ]
+ENTRYPOINT [ "/usr/bin/rgreeter" ]
