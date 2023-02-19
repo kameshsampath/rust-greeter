@@ -4,9 +4,10 @@ version = "0.1.0"
 edition = "2021"
 description = "A simple REST API to greeter a user by name. Typically used for quick demos and checks."
 readme = "README.md"
-license-file = "LICENSE"
+license = "ASL-2.0"
 authors = ["Kamesh Sampath<kamesh.sampath@hotmail.com>"]
 keywords = ["greeter","demos","REST","drone-io","cargo-zigbuild"]
+repository = "https://github.com/kameshsampath/rust-hello-world"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
