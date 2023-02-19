@@ -6,7 +6,7 @@ description = "A simple REST API to greeter a user by name. Typically used for q
 readme = "README.md"
 license-file = "LICENSE"
 authors = ["Kamesh Sampath<kamesh.sampath@hotmail.com>"]
-keywords = ["greeter","hello-world","demos","REST","dron-io","cargo-zigbuild"]
+keywords = ["greeter","demos","REST","drone-io","cargo-zigbuild"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
