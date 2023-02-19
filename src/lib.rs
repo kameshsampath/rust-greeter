@@ -11,8 +11,8 @@ pub mod service {
     /// Default message that will be returned with `/` REST path
     pub const DEFAULT_MESSAGE: &str = "Hello World!";
 
-    /// greeter_routes holds all the services routes that are handled by path `/greet`
-    pub mod greeter_routes;
+    /// greeter holds all the services routes that are handled by path `/greet`
+    pub mod greeter;
 
     /// HelloWorld service
     pub struct HelloWorld(Router);
@@ -22,7 +22,7 @@ pub mod service {
         pub fn new() -> Self {
             let app = Router::new()
                 .route("/", get(root))
-                .route("/greet", get(greeter_routes::greet));
+                .route("/greet", get(greeter::greet));
             HelloWorld(app)
         }
 

@@ -26,15 +26,15 @@ pub async fn greet(Query(params): Query<HashMap<String, String>>) -> (StatusCode
 #[cfg(test)]
 mod tests {
 
-    use std::collections::HashMap;
-
+    use super::*;
     use axum::extract::Query;
+    use std::collections::HashMap;
 
     #[tokio::test]
     async fn default_greeting() {
         let expected_params: HashMap<String, String> = HashMap::new();
         let query = Query(expected_params);
-        let (status_code, json_greeting) = super::greet(query).await;
+        let (status_code, json_greeting) = greet(query).await;
         assert_eq!(
             status_code.as_u16(),
             200,
@@ -53,7 +53,7 @@ mod tests {
         let mut expected_params: HashMap<String, String> = HashMap::new();
         expected_params.insert("name".to_string(), "Jack".to_string());
         let query = Query(expected_params);
-        let (status_code, json_greeting) = super::greet(query).await;
+        let (status_code, json_greeting) = greet(query).await;
         assert_eq!(
             status_code.as_u16(),
             200,
