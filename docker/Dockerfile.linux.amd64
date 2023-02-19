@@ -1,0 +1,7 @@
+FROM scratch
+
+ARG TARGETARCH
+
+COPY x86_64-unknown-linux-musl/release/rust-hello-world /usr/bin/hello-world
+
+ENTRYPOINT [ "/usr/bin/hello-world" ]

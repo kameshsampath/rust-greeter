@@ -38,9 +38,6 @@ steps:
     image: docker.io/kameshsampath/rust-zig-builder:v0.1.0
     pull: if-not-exists
     user: root
-    environment:
-      # (TODO) - why not able to write to mounted folder
-      CARGO_TARGET_DIR: /tmp/build
     commands:
       - task cross
     volumes:
