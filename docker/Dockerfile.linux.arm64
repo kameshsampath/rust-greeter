@@ -1,4 +1,4 @@
-FROM scratch
+FROM --platform=arm64 scratch
 
 ARG TARGETARCH
 
